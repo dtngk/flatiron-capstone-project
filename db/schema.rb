@@ -10,14 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_09_25_043515) do
+ActiveRecord::Schema.define(version: 2022_10_07_191107) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
   create_table "characters", force: :cascade do |t|
     t.string "name"
-    t.string "photo"
     t.integer "attack"
     t.integer "defense"
     t.integer "magic"
@@ -35,11 +34,17 @@ ActiveRecord::Schema.define(version: 2022_09_25_043515) do
     t.datetime "updated_at", precision: 6, null: false
   end
 
+  create_table "team_comments", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "team_id"
+    t.string "comment"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+  end
+
   create_table "teams", force: :cascade do |t|
     t.integer "user_id"
-    t.integer "char1_id"
-    t.integer "char2_id"
-    t.integer "char3_id"
+    t.string "characters", default: [], array: true
     t.string "team_name"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
@@ -47,7 +52,7 @@ ActiveRecord::Schema.define(version: 2022_09_25_043515) do
 
   create_table "users", force: :cascade do |t|
     t.string "username"
-    t.string "password"
+    t.string "password_digest"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
   end

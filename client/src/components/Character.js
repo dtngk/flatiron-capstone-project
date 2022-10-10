@@ -1,53 +1,45 @@
 // src/components/Character.js
-import React, {useState, useEffect} from "react";
+import React, {useState, useEffect} from 'react';
+import CharacterCard from '../cards/CharacterCard';
+import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
+//import { gsap } from "gsap";
 
 function Character() {
-
-    /**
-     * Localhost location for the database, where all the Characters are stored
-     
-    const host = "http://localhost:3000/characters";
-
     /**
      * useState to hold all the characters
      */
-    //const [characters, setCharacters] = useState([]);
-
+    
+    const [characters, setCharacters] = useState([]);
+  
     /**
      * runs when the project starts, fetches all the Characters and put them
      * into the characters useState
      */
-    /*
-    useEffect(() =>{
-        fetch(`${host}`)
-        .then ((result) => result.json())
-        .then ((data) => {
-            const store = data.map((char) => (char));
-            setCharacters(store);
-        });
+    useEffect(() => {
+        fetch("/characters")
+          .then((r) => r.json())
+          .then(setCharacters);
     }, [setCharacters]);
-    */
+    
     /**
      * Deletes a character from the database
      */
-    /*
     function deleteCharacterFromDataBase(id){
-        fetch(`${host}/${id}`, {
+        fetch("/characters/" + id, {
         method: "DELETE",
         })
-        .then((reponse) => reponse.json())
+        .then((reponse) => console.log(reponse.json()))
         .then(() => {
-        setCharacters(characters.filter((character) => character.id !== id))
+            setCharacters(characters.filter((character) => character.id !== id))
         }); 
     } 
-    */
+    
     /**
      * Adds a new Character to the database
      */
-    
-    /*
     function addCharacterToDataBase(character){
-        fetch(`${host}`, {
+        fetch("/characters", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -63,19 +55,20 @@ function Character() {
             }),
         })
     }
-    */
-    /*
-    const mall = stores.map(s => (
-        <StoreCard key={s.id} store={s} deleteStoreFromDataBase={deleteStoreFromDataBase}/>
-    ))
-    */
+    
     return (
-        <div>
-            <p>
-            In Character
-            </p>
-        </div>
-
+        <Stack spacing={1}>
+            <br/>
+           
+            <Grid container spacing={1}>
+                {characters.map(c => (
+                <Grid item>
+                    <CharacterCard key={c.id} character={c} deleteCharacter={deleteCharacterFromDataBase} />
+                </Grid>
+            ))}
+            </Grid>
+        </Stack>
+       
     )
 }
 

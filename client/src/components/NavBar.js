@@ -19,6 +19,8 @@ function NavBar() {
             <NavLink to="/character" style={styles}>Character</NavLink>
             <NavLink to="/comment" style={styles}>Comment</NavLink>
             <NavLink to="/team" style={styles}>Team</NavLink>
+            <NavLink to="/user" style={styles}>User</NavLink>
+            <NavLink to="/homepage" style={styles}>Home Page</NavLink>
         </nav>
     );
 }

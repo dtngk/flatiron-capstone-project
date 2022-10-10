@@ -1,5 +1,6 @@
 class TeamSerializer < ActiveModel::Serializer
-  attributes :id, :team_name, :user_id, :char1_id, :char2_id, :char3_id
+  attributes :id, :team_name, :user_id, :characters
   belongs_to :user
   #has_many :character
+  has_many :team_comment
 end

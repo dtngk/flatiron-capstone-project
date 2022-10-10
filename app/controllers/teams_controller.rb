@@ -15,7 +15,7 @@ class TeamsController < ApplicationController
     end
 
     def create
-        team = teams.create!(team_params)
+        team = Team.create!(team_params)
         render json: team, status: :created
     end
 
@@ -42,7 +42,7 @@ class TeamsController < ApplicationController
     private
 
     def team_params
-        params.permit(:id, :team_name, :user_id, :char1_id, :char2_id, :char3_id)
+        params.permit(:id, :team_name, :user_id, characters:[:character, :id, :name, :attack, :defense, :magic, :speed, :health]) 
     end
     
 end

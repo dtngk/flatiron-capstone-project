@@ -1,71 +1,88 @@
 // src/components/Comment.js
 import React, {useState, useEffect} from "react";
+import Grid from '@mui/material/Grid';
+import CommentCard from "../cards/CommentCard";
+//import { gsap } from "gsap";
 
 function Comment() {
-
-    /**
-     * Localhost location for the database, where all the Comments are stored
-     
-    const host = "http://localhost:3000/comments";
-
     /**
      * useState to hold all the stores
      */
-    //const [comments, setComments] = useState([]);
+    const [comments, setComments] = useState([]);
 
     /**
-     * runs when the project starts, fetches all the Stores and put them
-     * into the stores useState
+     * runs when the project starts, fetches all the comments and put them
+     * into the comments useState
      */
-    /*
     useEffect(() =>{
-        fetch(`${host}`)
+        fetch("/comments")
         .then ((result) => result.json())
         .then ((data) => {
             const comment = data.map((char) => (char));
-            setSComments(comment);
+            setComments(comment);
         });
     }, [setComments]);
-    */
+    
     /**
      * Deletes a comment from the database
      */
-    /*
     function deleteCommentFromDataBase(id){
-        fetch(`${host}/${id}`, {
-        method: "DELETE",
-        })
-        .then((reponse) => reponse.json())
-        .then(() => {
-        setComments(comments.filter((comment) => comment.id !== id))
+        fetch("/comments/" + id, {
+            method: "DELETE",
+            })
+            .then((reponse) => console.log(reponse.json()))
+            .then(() => {
+            setComments(comments.filter((comment) => comment.id !== id))
         }); 
     } 
-    */
+    
     /**
      * Adds a new comment to the database
      */
-    /*
     function addCommentToDataBase(comment){
-        fetch(`${host}`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-            user_id: comment.user_id,
-            character_id: comment.character_id,
-            comment: comment.comment
-        }),
+        fetch("/comments", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                user_id: comment.user_id,
+                character_id: comment.character_id,
+                comment: comment.comment
+            }),
         })
     }
-    */
+
+     /**
+     * Adds a edit comment from the database
+     */
+      function editCommentInDataBase(comment){
+        fetch("/comments/" + comment.id, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                user_id: comment.user_id,
+                character_id: comment.character_id,
+                comment: comment.comment
+            }),
+        })
+    }
 
     return (
-        <div>
-            <p>
-            In Comment
-            </p>
-        </div>
+        <Grid container spacing={1}>
+            {comments.map(c => (
+                <Grid item>
+                    <CommentCard 
+                        key={c.id} 
+                        comment={c} 
+                        deleteComment={deleteCommentFromDataBase} 
+                        editComment={editCommentInDataBase}
+                    />
+                </Grid>
+            ))}
+        </Grid>
     )
 }
 

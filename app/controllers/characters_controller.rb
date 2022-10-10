@@ -1,4 +1,7 @@
 class CharactersController < ApplicationController
+    rescue_from ActiveRecord::RecordNotFound, with: :render_not_found_response
+    # added rescue_from
+    rescue_from ActiveRecord::RecordInvalid, with: :render_unprocessable_entity_response
 
     def index
         characters = Character.all
@@ -44,5 +47,9 @@ class CharactersController < ApplicationController
 
     def character_params
         params.permit(:id, :name, :photo, :attack, :defense, :magic, :speed, :health)
+    end
+
+    def render_unprocessable_entity_response(invalid)
+        render json: { errors: invalid.record.errors }, status: :unprocessable_entity
     end
 end
