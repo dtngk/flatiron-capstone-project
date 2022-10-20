@@ -55,11 +55,6 @@ function TeamCard({team, deleteTeam}) {
         setEditComment(true);
     }
     
-    const handleCloseAdd = () => {
-        setEditComment(false);
-        setEdit(false);
-    }
-
     const handleClickRemove = () => {
         setRemoveTeam(true);
     };
@@ -108,6 +103,8 @@ function TeamCard({team, deleteTeam}) {
                 team_name: newTeam
             }), 
         });
+
+        handleClose();
     }
 
     const char1 = (team.characters[0]) ? (team.characters[0].split(',')) : null

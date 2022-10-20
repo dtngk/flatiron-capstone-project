@@ -57,7 +57,7 @@ function CharacterCard({character}) {
             }),
             }).then((r) => {
                 if (r.ok) {
-                    r.json().then(() => handleCloseEdit());
+                    r.json().then(() => setEdit(false));
                 }  else {
                     r.json().then((err) => {
                         setErrors("Comment " + err.errors.comment);

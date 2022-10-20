@@ -1,5 +1,12 @@
 # Capstone Project
 
+## Info
+
+YouTube link for Demo: https://youtu.be/FKfBUJ5XC8o
+
+
+This project uses Ruby version 3.1.2
+Run "rake db:seed" to seed all the Characters. If command is not ran then Users will not have any characters to comment on, rank or create teams.
 
 ## Description
 
@@ -50,3 +57,11 @@ As a User:
     - Rank the characters and edit the ranking (Other users cannot see the ranking)
     - Log out of my account
     - Delete my account
+
+
+## Stretch
+
+- Add an admin account
+- Add the ability for drap and drop on creating a Team
+- Add picture to each Character
+- Add Regex for email validation

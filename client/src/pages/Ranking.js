@@ -56,6 +56,7 @@ function Ranking({rank, user}) {
           rank: characters
     }),
     });
+    
     setEdit(false);
   }
   
