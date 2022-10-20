@@ -8,6 +8,12 @@ YouTube link for Demo: https://youtu.be/FKfBUJ5XC8o
 This project uses Ruby version 3.1.2
 Run "rake db:seed" to seed all the Characters. If command is not ran then Users will not have any characters to comment on, rank or create teams.
 
+
+To switch Ruby version: rvm use <verison number> (Ex: rvm use 3.1.2) 
+Run the frontend on http://localhost:4000: npm start --prefix client
+Run the backend on http://localhost:3000: rails s
+To start the SQL: sudo service postgresql start 
+
 ## Description
 
 This project contains 6 different Models (user, team, character, comment, team_comments and ranking).
