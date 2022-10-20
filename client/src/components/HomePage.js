@@ -1,14 +1,8 @@
 // src/components/Homepage.js
 import React from 'react';
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import Toolbar from '@mui/material/Toolbar';
-import IconButton from '@mui/material/IconButton';
-import Menu from '@mui/material/Menu';
-import Container from '@mui/material/Container';
-import Avatar from '@mui/material/Avatar';
-import Tooltip from '@mui/material/Tooltip';
-import MenuItem from '@mui/material/MenuItem';
+import Main from './Main';
+import { AppBar, Box, Toolbar, IconButton, Menu } from '@mui/material/';
+import { Container, Avatar, Tooltip, MenuItem } from '@mui/material/';
 import { NavLink } from "react-router-dom";
 
 const styles = {
@@ -20,6 +14,7 @@ const styles = {
 function HomePage() {
 
     const [anchorElUser, setAnchorElUser] = React.useState(null);
+    const user = React.useContext(Main)
 
     const handleOpenUserMenu = (event) => {
         setAnchorElUser(event.currentTarget);
@@ -58,16 +53,11 @@ function HomePage() {
                             <NavLink to="/user" style={styles}>User</NavLink>
                         </nav>
                     </MenuItem>
-                    <MenuItem key={"new-team"} >
-                        <nav className="navbar">
-                            <NavLink to="/newteam" style={styles}>New Team</NavLink>
-                        </nav>
-                    </MenuItem>
                         
                     <Box sx={{ flexGrow: 0 }}>
-                        <Tooltip title= "User">
+                        <Tooltip title= {user.user.username}>
                             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                <Avatar alt="user icon" src="" />
+                                <Avatar alt="user icon" />
                             </IconButton>
                         </Tooltip>
                         <Menu
@@ -91,17 +81,12 @@ function HomePage() {
                                     <NavLink to="/account" style={styles}>Account</NavLink>
                                 </nav>
                             </MenuItem>
-
-                            <MenuItem key={"logout"} onClick={handleCloseUserMenu}>
-                                <nav className="navbar">
-                                    <NavLink to="/account" style={styles}>Log Out</NavLink>
-                                </nav>
-                            </MenuItem>
                         </Menu>
                     </Box>
                 </Toolbar>
             </Container>
         </AppBar>
     );
-};
+}
+
 export default HomePage;

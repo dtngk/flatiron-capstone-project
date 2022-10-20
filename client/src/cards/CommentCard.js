@@ -1,24 +1,27 @@
 // src/cards/CommentCard.js
 import React from 'react';
-import Typography from '@mui/material/Typography';
-import Card from '@mui/material/Card';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import Main from '../components/Main';
+import { Typography, Card, Stack, Button, TextField } from '@mui/material/';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material/';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
-
+/**
+ * Parameter comment comes from /pages/Comment.js
+ * Parameter deleteComment is function deleteCommentFromDataBase in /pages/Comment.js
+ * Paramter editComment is function in editCommentInDataBase /pages/Comment.js
+ */
 function CommentCard({comment, deleteComment, editComment}) {
 
     const [edit, setEdit] = React.useState(false);
     const [removeComment, setRemoveComment] = React.useState(false);
     const [newComment, setNewComment] = React.useState("");
+    const user = React.useContext(Main);
+
+    const cardStyle = {
+        display: 'block',
+        width: '20vw',
+    };
 
     const handleClickEdit = () => {
         setEdit(true);
@@ -39,7 +42,7 @@ function CommentCard({comment, deleteComment, editComment}) {
     const handleDelete = (e) => {
         e.preventDefault();
         setRemoveComment(false);
-        deleteComment(comment.id)
+        deleteComment(comment.id);
     };
 
     const handleEdit = () => {
@@ -49,17 +52,22 @@ function CommentCard({comment, deleteComment, editComment}) {
     };
 
     return (
-        <Card sx={{border: 3}} align='center'>
+        <Card sx={{border: 3}} style={cardStyle} align='center'>
             <Typography variant="h5" color="purple">
                 {comment.user.username +"'s comment on " + comment.character.name} 
             </Typography>
             <Stack direction="row" spacing={1}>
-                <Typography variant="h6">
+                <Typography variant="subtitle1">
                     {comment.comment}
                 </Typography>
-                <Button variant="contained" startIcon={<EditIcon/>} onClick={handleClickEdit}>
-                    Edit
-                </Button>
+                
+            </Stack>
+            <Stack>
+                {(user.user.id === comment.user_id) ? (
+                    <Button variant="contained" startIcon={<EditIcon/>} onClick={handleClickEdit}>
+                        Edit
+                    </Button> ) : (null)
+                }
                 <Dialog open={edit} onClose={handleClickEdit} >
                     <DialogTitle>Edit Comment</DialogTitle>
                     <DialogContent>
@@ -82,10 +90,12 @@ function CommentCard({comment, deleteComment, editComment}) {
                         <Button onClick={handleCloseEdit}>Cancel</Button>
                     </DialogActions>
                 </Dialog>
-
+                
+                {(user.user.id === comment.user_id) ? (                    
                 <Button variant="contained" startIcon={<DeleteIcon/>} onClick={handleClickRemove}>
                     Delete
-                </Button>
+                </Button> ) : (null)
+                }
                 <Dialog open={removeComment} onClose={handleCloseRemove}>
                     <DialogTitle>Delete</DialogTitle>
                         <DialogContent>
@@ -98,18 +108,9 @@ function CommentCard({comment, deleteComment, editComment}) {
                             <Button onClick={handleCloseRemove}>No</Button>
                         </DialogActions>
                 </Dialog>
-            </Stack>
+            </Stack> 
         </Card>
-  );
+    );
 }
 
 export default CommentCard;
-
-/**
- * <Chip
-        label="Delete"
-        onDelete={handleDelete}
-        deleteIcon={<DeleteIcon />}
-        variant="outlined"
-    />
- */

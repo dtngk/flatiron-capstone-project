@@ -1,43 +1,63 @@
 // src/cards/TeamCard.js
-import React from 'react';
-import Typography from '@mui/material/Typography';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardHeader from '@mui/material/CardHeader';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import React, {useState, useEffect} from 'react';
+import Main from '../components/Main';
+import { Typography, Card, CardHeader, CardContent, Stack, Grid } from '@mui/material/';
+import { Button, TextField, Select, MenuItem, FormControl, InputLabel } from '@mui/material/';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material/';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
 
-
+/**
+ * Parameter team comes from /pages/Team.js
+ * Parameter deleteTeam comes is fucntion deleteTeamFromDataBase in /pages/Team.js
+ */
 function TeamCard({team, deleteTeam}) {
 
+    const [characters, setCharacters] = useState([]);
+    const user = React.useContext(Main);
+  
+    /**
+     * runs when the project starts, fetches all the Characters and put them
+     * into the characters useState
+     */
+    useEffect(() => {
+        fetch("/characters")
+          .then((r) => r.json())
+          .then(setCharacters);
+    }, []);
+
     const [edit, setEdit] = React.useState(false);
+    const [editComment, setEditComment] = React.useState(false);
     const [removeTeam, setRemoveTeam] = React.useState(false);
     const [newTeam, setNewTeam] = React.useState("");
     const [newComment, setNewComment] = React.useState("");
+    const [errors, setErrors] = React.useState([]);
+    const [one, setOne] = React.useState('');
+    const [two, setTwo] = React.useState('');
+    const [three, setThree] = React.useState('');
+
+    const handleClose = () => {
+        setEdit(false);
+        setEditComment(false);
+        setErrors([]);
+        setOne('');
+        setTwo('');
+        setThree('');
+        setNewTeam('');
+    };
 
     const handleClickEdit = () => {
         setEdit(true);
     };
 
-    const handleCloseEdit = () => {
-        setEdit(false);
-    };
-
     const handleClickAdd = () => {
-        setNewComment(true);
+        setEditComment(true);
     }
     
     const handleCloseAdd = () => {
-        setNewComment(false);
+        setEditComment(false);
+        setEdit(false);
     }
 
     const handleClickRemove = () => {
@@ -54,26 +74,41 @@ function TeamCard({team, deleteTeam}) {
         deleteTeam(team.id)
     };
 
-    const handleEdit = () => {
-        setEdit(false);
-    };
-
     function handleAddTeamComment(){
-        setNewComment(false);
         fetch("/team_comments", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                user_id: 3,
+                user_id: user.user.id,
                 team_id: team.id,
-                comment: newComment
+                comment: newComment,
             }),
-        })
+            }).then((r) => {
+            if (r.ok) {
+                r.json().then(() => handleClose());
+            }  else {
+                r.json().then((err) => {
+                    setErrors(err.errors)});
+            }
+        });     
     }
 
-    console.log(team)
+    function handleEditTeam(){
+        fetch("/teams/" + team.id, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                user_id: team.user.id,
+                team_id: team.id,
+                characters: teamArray,
+                team_name: newTeam
+            }), 
+        });
+    }
 
     const char1 = (team.characters[0]) ? (team.characters[0].split(',')) : null
     const char2 = (team.characters[1]) ? (team.characters[1].split(',')) : null
@@ -103,10 +138,14 @@ function TeamCard({team, deleteTeam}) {
                     char3[5].substring(char3[5].indexOf(">")+1, char3[5].length),
                     char3[6].substring(char3[6].indexOf(">")+1, char3[6].length-1)]) : null;
     
-   
+    const teamArray = [characters[one - 1], characters[two - 1], characters[three - 1]];
+
+    const charArray = characters.map(c => (
+        <MenuItem key={c.id} value={c.id}>{c.name}</MenuItem>
+    ))
 
     return (
-        <Card sx={{minWidth: 300, border: 2}} align='center'>
+        <Card sx={{minWidth: 400, maxWidth: 400, border: 2}} align='center'>
             <CardHeader 
                 title={team.user.username + "'s Team"} 
             />
@@ -124,7 +163,7 @@ function TeamCard({team, deleteTeam}) {
                             Magic: {hero1[4]} 🧙 <br/>
                             Defense: {hero1[3]} 🛡️ <br/>
                             Speed: {hero1[5]} 👟
-                        </Typography> ) : (<br></br>)}
+                        </Typography> ) : (null)}
                         {hero2 ? (
                         <Typography color="purple" sx={{border: 3}}>
                             {hero2[1]} <br/>
@@ -133,7 +172,7 @@ function TeamCard({team, deleteTeam}) {
                             Magic: {hero2[4]} 🧙 <br/>
                             Defense: {hero2[3]} 🛡️ <br/>
                             Speed: {hero2[5]} 👟
-                        </Typography> ) : (<br></br>)}
+                        </Typography> ) : (null)}
                         {hero3 ? ( 
                         <Typography color="purple" sx={{border: 3}}>
                             {hero3[1]} <br/>
@@ -142,16 +181,20 @@ function TeamCard({team, deleteTeam}) {
                             Magic: {hero3[4]} 🧙 <br/>
                             Defense: {hero3[3]} 🛡️ <br/>
                             Speed: {hero3[5]} 👟
-                        </Typography> ) : (<br></br>)}
+                        </Typography> ) : (null)}
                     </Stack> 
                 </Typography> 
             </CardContent>
 
             <Stack direction="row" spacing={2}>
-                <Button variant="contained" startIcon={<AddCircleIcon/>} onClick={handleClickAdd}>
-                    Comment
-                </Button>
-                <Dialog open={Boolean(newComment)} onClose={handleClickAdd}>
+                
+                {(user.user.id !== team.user_id) ? (
+                    <Button variant="contained" startIcon={<AddCircleIcon/>} onClick={handleClickAdd}>
+                        Comment
+                    </Button>) : (null)
+                }
+
+                <Dialog open={editComment} onClose={handleClickAdd}>
                     <DialogTitle>Add Comment</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
@@ -169,40 +212,89 @@ function TeamCard({team, deleteTeam}) {
                         />
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleAddTeamComment}>Add Comment</Button>
-                        <Button onClick={handleCloseAdd}>Cancel</Button>
+                        <Grid>
+                            {(errors.length !== 0) ? ( 
+                                <ul>
+                                    Error trying to comment a Team.
+                                        <li>
+                                            {errors}
+                                        </li>
+                                </ul> 
+                                ) : (null)
+                            }
+                            <Button onClick={handleAddTeamComment}>Add Comment</Button>
+                            <Button onClick={handleClose}>Cancel</Button>
+                        </Grid>
                     </DialogActions>
                 </Dialog>
                 
-                <Button variant="contained" startIcon={<EditIcon/>} onClick={handleClickEdit}>
-                    Edit
-                </Button>
+                {(user.user.id === team.user_id) ? (
+                    <Button variant="contained" startIcon={<EditIcon/>} onClick={handleClickEdit}>
+                        Edit
+                    </Button> ) : (null)
+                }
                 <Dialog open={edit}  onClose={handleClickEdit}>
                     <DialogTitle>Edit Team</DialogTitle>
                     <DialogContent>
                         <DialogContentText>
-                            
+                        <Stack sx={{ minWidth: 180 }} align='center' spacing={2}>
+                            <br/>
+                            <TextField
+                                autoFocus
+                                margin="dense"
+                                id="name"
+                                label="Edit Team Name"
+                                fullWidth
+                                variant="standard"
+                                onChange={(e) => {setNewTeam(e.target.value)}}
+                                type={newTeam}
+                            />
+                            <FormControl>
+                                <InputLabel>Character 1:</InputLabel>
+                                <Select
+                                    value={one}
+                                    label="character1"
+                                    onChange={(e) => setOne(e.target.value)}
+                                >
+                                    {charArray}
+                                </Select>
+                            </FormControl>
+                            <FormControl>
+                                <InputLabel>Character 2:</InputLabel>
+                                <Select
+                                    value={two}
+                                    label="Age"
+                                    onChange={(e) => setTwo(e.target.value)}
+                                >
+                                    {charArray}
+                                </Select>
+                            </FormControl>
+                            <FormControl>
+                                <InputLabel>Character 3:</InputLabel>
+                                <Select
+
+                                    value={three}
+                                    label="Age"
+                                    onChange={(e) => setThree(e.target.value)}
+                                >
+                                    {charArray}
+                                </Select>
+                            </FormControl>
+                        </Stack>        
                         </DialogContentText>
-                        <TextField
-                            autoFocus
-                            margin="dense"
-                            id="name"
-                            label="Edit Team"
-                            fullWidth
-                            variant="standard"
-                            onChange={(e) => {setNewTeam(e.target.value)}}
-                            type={newTeam}
-                        />
+                       
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleEdit}>Edit</Button>
-                        <Button onClick={handleCloseEdit}>Cancel</Button>
+                        <Button onClick={handleEditTeam}>Edit</Button>
+                        <Button onClick={handleClose}>Cancel</Button>
                     </DialogActions>
                 </Dialog>
-
-                <Button variant="contained" startIcon={<DeleteIcon/>} onClick={handleClickRemove}>
-                    Delete
-                </Button>
+                
+                {(user.user.id === team.user_id) ? (
+                    <Button variant="contained" startIcon={<DeleteIcon/>} onClick={handleClickRemove}>
+                        Delete
+                    </Button> ) : (null)
+                }
                 <Dialog open={removeTeam} onClose={handleCloseRemove}>
                     <DialogTitle>Delete</DialogTitle>
                         <DialogContent>
@@ -217,18 +309,8 @@ function TeamCard({team, deleteTeam}) {
                 </Dialog>
                 
             </Stack>
-        </Card>
-      
-  );
+        </Card>    
+    );
 }
 
 export default TeamCard;
-
-/**
- * <Chip
-        label="Delete"
-        onDelete={handleDelete}
-        deleteIcon={<DeleteIcon />}
-        variant="outlined"
-    />
- */

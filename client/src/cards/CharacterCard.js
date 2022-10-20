@@ -1,23 +1,13 @@
 // src/cards/CharacterCard.js
-import React from 'react';
+import React, { useState } from 'react';
+import Main from '../components/Main';
 import { styled } from '@mui/material/styles';
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
-import CardActions from '@mui/material/CardActions';
-import Collapse from '@mui/material/Collapse';
-import IconButton, { IconButtonProps } from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import { Card, CardContent, CardActions } from '@mui/material/';
+import { Collapse, IconButton, Typography, Grid } from '@mui/material/';
+import { Stack, Button, TextField } from '@mui/material/';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material/';
 import AddCircleIcon from '@mui/icons-material/AddCircle';
-import { Grid } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const ExpandMore = styled((props) => {
     const { expand, ...other } = props;
@@ -30,21 +20,19 @@ const ExpandMore = styled((props) => {
     }),
 }));
 
-function CharacterCard({character, deleteCharacter}) {
+/** 
+ * paramter character comes from /pages/Character.js
+ */ 
+function CharacterCard({character}) {
+
     const [expanded, setExpanded] = React.useState(false);
     const [edit, setEdit] = React.useState(false);
     const [newComment, setNewComment] = React.useState("");
+    const [errors, setErrors] = useState([]);
+    const user = React.useContext(Main)
 
     const handleExpandClick = () => {
         setExpanded(!expanded);
-    };
-
-    const handleDelete = () => {
-        deleteCharacter(character.id)
-    };
-
-    const handleEdit = () => {
-        
     };
 
     const handleClickEdit = () => {
@@ -53,34 +41,46 @@ function CharacterCard({character, deleteCharacter}) {
 
     const handleCloseEdit = () => {
         setEdit(false);
+        setErrors([]);
     };
 
-    
-
-    function addCommentToDataBase(e){
+    function addCommentToDataBase(){
         fetch("/comments", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                user_id: 1,
+                user_id: user.user.id,
                 character_id: character.id,
                 comment: newComment
             }),
-        })
-        setEdit(false);
+            }).then((r) => {
+                if (r.ok) {
+                    r.json().then(() => handleCloseEdit());
+                }  else {
+                    r.json().then((err) => {
+                        setErrors("Comment " + err.errors.comment);
+                    })
+                }
+        });
     }
 
-    const comments = character.comment.map(c => (c.comment))
+    const comments = character.comment.map(c =>{
+        return (
+            <li key={c.id}>
+                {c.comment}
+            </li>
+        )
+    });
 
     return (
-        <Card sx={{minWidth: 400, border: 3}} style={{backgroundColor: "white"}} align='center'>
+        <Card sx={{minWidth: 200, maxWidth: 200, border: 3}} style={{backgroundColor: "white"}} align='center'>
             <CardContent>
-                <Typography variant="h2" color="blue">
+                <Typography variant="h4" color="blue">
                     {character.name}<br/>
                 </Typography>
-                <Typography variant="h5" color="purple">
+                <Typography variant="h6" color="purple">
                    <br/> Health: {character.health} ❤️ <br/>
                     Attack: {character.attack} ⚔️ <br/>
                     Magic: {character.magic} 🧙 <br/>
@@ -88,7 +88,6 @@ function CharacterCard({character, deleteCharacter}) {
                     Speed: {character.speed} 👟 <br/>
                 </Typography>
             </CardContent>
-
             <CardActions disableSpacing>
                 <ExpandMore
                     expand={expanded}
@@ -99,16 +98,15 @@ function CharacterCard({character, deleteCharacter}) {
                 <ExpandMoreIcon />
                 </ExpandMore>
             </CardActions>
-
             <Collapse in={expanded} timeout="auto" unmountOnExit>
-             
-                    <Grid>{comments}</Grid>
-            
+                {comments} 
             </Collapse>
                 <Stack>
+                    
                     <Button variant="contained" startIcon={<AddCircleIcon/>} onClick={handleClickEdit}>
                         Comment
                     </Button>
+                    
                     <Dialog open={edit} onClose={handleClickEdit}>
                         <DialogTitle>Add Comment</DialogTitle>
                         <DialogContent>
@@ -126,12 +124,22 @@ function CharacterCard({character, deleteCharacter}) {
                                 type={newComment}
                             />
                         </DialogContent>
-                        <DialogActions>
-                            <Button onClick={addCommentToDataBase}>Add</Button>
-                            <Button onClick={handleCloseEdit}>Cancel</Button>
+                         <DialogActions>
+                            <Grid>
+                                {(errors.length !== 0) ? ( 
+                                    <ul>
+                                        Error trying to comment on a Character.
+                                            <li>
+                                                {errors}
+                                            </li>
+                                    </ul> 
+                                    ) : (null)
+                                }
+                                <Button onClick={addCommentToDataBase}>Add</Button>
+                                <Button onClick={handleCloseEdit}>Cancel</Button>
+                            </Grid>
                         </DialogActions>
                     </Dialog>
-                    
                 </Stack>
         </Card>
     );

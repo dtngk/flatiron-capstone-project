@@ -1,30 +1,27 @@
 // src/cards/TeamCommentCard.js
 import React from 'react';
-import Typography from '@mui/material/Typography';
-import Card from '@mui/material/Card';
-import CardHeader from '@mui/material/CardHeader';
-import Stack from '@mui/material/Stack';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import Main from '../components/Main';
+import { Typography, Card, CardHeader, Stack, Button, TextField } from '@mui/material/';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material/';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
 
 const cardStyle = {
     display: 'block',
-    //width: '35vw',
-   // height: '26vw'
-}
+    width: '20vw',
+};
 
+/**
+ * Parameter comment comes from /pages/TeamComment.js
+ * Parameter deleteComment is function deleteCommentFromDataBase /pages/TeamComment.js
+ * Parameter editComment is function editCommentInDataBase in /pages/TeamComment.js
+ */
 function TeamCommentCard({comment, deleteComment, editComment}) {
 
     const [edit, setEdit] = React.useState(false);
     const [removeComment, setRemoveComment] = React.useState(false);
     const [newComment, setNewComment] = React.useState("");
+    const user = React.useContext(Main)
 
     const handleClickEdit = () => {
         setEdit(true);
@@ -54,23 +51,21 @@ function TeamCommentCard({comment, deleteComment, editComment}) {
         editComment(comment);
     };
 
-    console.log(comment.user)
-
     return (
         
-        <Card style={cardStyle} sx={{border: 3}} align='center'>
+        <Card style={cardStyle} sx={{minHeight: 216, border: 3}} align='center'>
             <CardHeader
-        
-                    title={comment.user.username +"'s comment on " + comment.team.team_name} 
-               
+                title={comment.user.username +"'s comment on " + comment.team.team_name} 
             />
             <Stack direction="column" spacing={1} >
-                <Typography variant="h6" align='center'>
+                <Typography variant="h6" align='center' noWrap>
                     {comment.comment}
                 </Typography>
-                <Button variant="contained" startIcon={<EditIcon/>} onClick={handleClickEdit}>
-                    Edit
-                </Button>
+                {(user.user.id === comment.user_id) ? (
+                    <Button variant="contained" startIcon={<EditIcon/>} onClick={handleClickEdit}>
+                        Edit
+                    </Button> ) : (null)
+                }
                 <Dialog open={edit} onClose={handleClickEdit}>
                     <DialogTitle>Edit Comment</DialogTitle>
                     <DialogContent>
@@ -94,9 +89,11 @@ function TeamCommentCard({comment, deleteComment, editComment}) {
                         </DialogActions>
                     </Dialog>
 
-                <Button variant="contained" startIcon={<DeleteIcon/>} onClick={handleClickRemove}>
-                    Delete
-                </Button>
+                {(user.user.id === comment.user_id) ? (
+                    <Button variant="contained" startIcon={<DeleteIcon/>} onClick={handleClickRemove}>
+                        Delete
+                    </Button> ) : (null)
+                }
                 <Dialog open={removeComment} onClose={handleCloseRemove}>
                     <DialogTitle>Delete</DialogTitle>
                         <DialogContent>
@@ -110,18 +107,8 @@ function TeamCommentCard({comment, deleteComment, editComment}) {
                         </DialogActions>
                 </Dialog>
             </Stack>
-        </Card>
-      
-  );
+        </Card>   
+    );
 }
 
 export default TeamCommentCard;
-
-/**
- * <Chip
-        label="Delete"
-        onDelete={handleDelete}
-        deleteIcon={<DeleteIcon />}
-        variant="outlined"
-    />
- */
