@@ -43,7 +43,7 @@ function Ranking({rank, user}) {
         setCharacters(user)
       }); 
     }
-  }, []);
+  }, [rank]);
 
   function addRankingToDatabase(){
     fetch("/rankings", {
