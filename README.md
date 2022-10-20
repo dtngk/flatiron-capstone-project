@@ -9,7 +9,7 @@
 - Run "rake db:seed" to seed all the Characters. If command is not ran then Users will not have any characters to comment on, rank or create teams.
 
 
-- To switch Ruby version: rvm use <verison number> (Ex: rvm use 3.1.2) 
+- To switch Ruby version: rvm use (verison number), (Ex: rvm use 3.1.2) 
 - Run the frontend on http://localhost:4000: npm start --prefix client
 - Run the backend on http://localhost:3000: rails s
 - To start the SQL: sudo service postgresql start 
